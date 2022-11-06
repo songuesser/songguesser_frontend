@@ -2,8 +2,27 @@ import type { NextPage } from 'next';
 import Head from 'next/head';
 import Image from 'next/image';
 import styles from '../styles/Home.module.css';
+import io, { Socket } from 'socket.io-client';
+import { useEffect, useState } from 'react';
 
 const Home: NextPage = () => {
+  const [socket, setSocket] = useState<Socket | null>(null);
+
+  useEffect(() => {
+    const newSocket = io(`http://localhost:4000`);
+    setSocket(newSocket);
+  }, [setSocket]);
+
+  useEffect(() => {
+    if (socket == null) {
+      return;
+    }
+
+    socket.on('users', (message) => {
+      console.log(message);
+    });
+  }, [socket]);
+
   return (
     <div className={styles.container}>
       <Head>
@@ -21,6 +40,14 @@ const Home: NextPage = () => {
           Get started by editing{' '}
           <code className={styles.code}>pages/index.tsx</code>
         </p>
+
+        {socket ? (
+          <div className="chat-container">
+            <div>COnnected</div>
+          </div>
+        ) : (
+          <div>Not Connected</div>
+        )}
 
         <div className={styles.grid}>
           <a href="https://nextjs.org/docs" className={styles.card}>
