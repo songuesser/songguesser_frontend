@@ -2,6 +2,11 @@
   padding: 0 2rem;
 }
 
+.connectButton {
+  margin-top: 1rem;
+  padding: 0rem 4rem;
+}
+
 .main {
   min-height: 100vh;
   padding: 4rem 0;
