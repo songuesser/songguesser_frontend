@@ -6,6 +6,8 @@ import { io, Socket } from 'socket.io-client';
 import { useState } from 'react';
 import { User } from '../models/user';
 import { Room } from '../models/room';
+import { NextResponse } from 'next/server';
+import Link from 'next/link';
 
 const Home: NextPage = () => {
   const [userName, setUsername] = useState<string>('');
@@ -16,9 +18,18 @@ const Home: NextPage = () => {
   const [clientId, setClientId] = useState<string>('');
   const [socket, setSocket] = useState<Socket | null>(null);
 
-  const connectToServer = () => {
-    
-    const newSocket = io(`http://localhost:4000`);
+  const initializeGame = () => {
+    if (newUserName == "") {
+      console.log("Empty Username")
+      return;
+    }
+    const newSocket = io(`http://localhost:4000`,
+      {
+        query: {
+          "userName": newUserName,
+          "language": "en",
+        }
+      });
     setSocket(newSocket);
 
     newSocket.on('connect', () => {
@@ -35,6 +46,8 @@ const Home: NextPage = () => {
       console.log('setUsername', newUserName);
       setUsername(newUserName);
     });
+
+    //document.location.href = 'rooms'
   };
 
   const updateUsername = () => {
@@ -45,20 +58,6 @@ const Home: NextPage = () => {
     socket?.emit('setUsername', { userId: clientId, username: newUserName });
   };
 
-  const createRoom = () => {
-    if (socket == null) {
-      return;
-    }
-
-    socket?.emit('createRoom', { clientId: clientId, roomName: newRoomName });
-    socket?.on('roomCreated', (roomData: Room) => {
-      setRoomName(roomData.roomName);
-      setRoomId(roomData.roomId);
-
-      console.log("Frontend: Room Created with Name: " + roomName + " and ID: " + roomId)
-    })
-
-  };
 
 
   return (
@@ -71,55 +70,21 @@ const Home: NextPage = () => {
 
       <main className={styles.main}>
         <h1 className={styles.title}>Welcome to Songguesser!</h1>
-        <button
-          className={styles.connectButton}
-          onClick={() => connectToServer()}
-        >
-          <p>Connect to server</p>
-        </button>
-        <p>Update username below:</p>
+
+        <p>Enter your Name!:</p>
         <input
           type={'text'}
           onChange={(e) => setNewUsername(e.target.value)}
           value={newUserName}
         />
-        <button
+        <button 
           className={styles.connectButton}
-          onClick={() => updateUsername()}
+          onClick={() => initializeGame()}
         >
-          <p>Update username</p>
-        </button>
-        <p>Status:</p>
-        {socket && socket.active ? <p>Connected</p> : <p>Not Connected</p>}
-        {socket && socket.active && (
-          <p>Current user name: {userName ?? 'hey'}</p>
-        )}
-        <p>Enter Room Name:</p>
-        <input
-          type={'text'}
-          onChange={(e) => setNewRoomName(e.target.value)}
-          value={newRoomName}
-        />
-        <button
-          className={styles.connectButton}
-          onClick={() => createRoom()}
-        >
-          <p>Create Room</p>
+          <p>Play!</p>
         </button>
       </main>
 
-      <footer className={styles.footer}>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <span className={styles.logo}>
-            <Image src="/vercel.svg" alt="Vercel Logo" width={72} height={16} />
-          </span>
-        </a>
-      </footer>
     </div>
   );
 };
