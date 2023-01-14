@@ -79,7 +79,7 @@ const Lobby: NextPage = () => {
       setRoomName(roomData.roomName);
       setRoomId(roomData.roomId);
 
-      router.push({ pathname: '/room/', query: { id: roomData.roomId } });
+      pushToRoom(roomData.roomId);
 
       console.log(
         'Frontend: Room Created with Name: ' + roomName + ' and ID: ' + roomId,
@@ -92,6 +92,10 @@ const Lobby: NextPage = () => {
       console.log('ROOM UDPATES');
       setOpenRooms(data.rooms);
     });
+  };
+
+  const pushToRoom = (roomId: string) => {
+    router.push({ pathname: '/room/', query: { id: roomId } });
   };
 
   return (
@@ -126,6 +130,9 @@ const Lobby: NextPage = () => {
         return (
           <div key={key}>
             <p>{room.roomName}</p>
+            <button onClick={() => pushToRoom(room.roomId)}>
+              <p>Connect</p>
+            </button>
           </div>
         );
       })}
