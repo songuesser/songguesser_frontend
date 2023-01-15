@@ -9,7 +9,7 @@ import { WEBSOCKET_CHANNELS } from '../models/enum/websocket_channels';
 import { Player } from '../models/players';
 import styles from '../styles/Home.module.css';
 
-const RoomsPage: NextPage = () => {
+const Game: NextPage = () => {
   const socket = useContext(SocketContext);
   const router = useRouter();
   const [players, setPlayers] = useState<Player[]>([]);
@@ -64,7 +64,7 @@ const RoomsPage: NextPage = () => {
   return (
     <div className={styles.container}>
       <main className={styles.main}>
-        <h1 className={styles.title}>Room: {roomName}</h1>
+        <h1 className={styles.title}>Game: {roomName}</h1>
         <h2>RoomId: {roomId}</h2>
         {players.map((player, key) => {
           return <p key={key}>{player.username}</p>;
@@ -74,4 +74,4 @@ const RoomsPage: NextPage = () => {
   );
 };
 
-export default RoomsPage;
+export default Game;

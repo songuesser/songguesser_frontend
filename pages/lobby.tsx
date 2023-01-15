@@ -23,7 +23,7 @@ const Lobby: NextPage = () => {
 
   useEffect(() => {
     if (socket == undefined) {
-      console.log('SOCKET UNDEFINED');
+      // TODO: Error when socket is not connected
       return;
     }
 
