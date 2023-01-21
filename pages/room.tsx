@@ -8,6 +8,9 @@ import { RoomsList } from '../dto/listRooms';
 import { WEBSOCKET_CHANNELS } from '../models/enum/websocket_channels';
 import { Player } from '../models/players';
 import styles from '../styles/Home.module.css';
+import { User } from '../models/user';
+import { EVENTS } from '../models/enum/events';
+import { CreateGameDTO } from '../dto/createGame';
 
 const RoomsPage: NextPage = () => {
   const socket = useContext(SocketContext);
@@ -15,6 +18,7 @@ const RoomsPage: NextPage = () => {
   const [players, setPlayers] = useState<Player[]>([]);
   const [roomName, setRoomName] = useState<string>('');
   const [roomId, setRoomId] = useState<string>('');
+  const [admin, setAdmin] = useState<User>();
 
   useEffect(() => {
     const id: string = router.query.id as string;
@@ -29,9 +33,11 @@ const RoomsPage: NextPage = () => {
     setRoomId(id);
     listenToRoomUpdates(id, socket);
     joinRoom(id, socket);
+    listenToGameStart(id, socket);
 
     return () => {
       socket.off(WEBSOCKET_CHANNELS.LIST_ROOMS);
+      socket.off(WEBSOCKET_CHANNELS.CREATE_GAME);
     };
   }, [router.query, socket]);
 
@@ -58,13 +64,40 @@ const RoomsPage: NextPage = () => {
 
       setRoomName(room?.roomName);
       setPlayers(room.players);
+      setAdmin(room.admin);
     });
+  };
+
+  const listenToGameStart = (id: string, socket: Socket) => {
+    console.log('Listening to game start');
+    socket.on(WEBSOCKET_CHANNELS.CREATE_GAME, (event: EVENTS) => {
+      console.log('Game start event received');
+      if (event == EVENTS.GAME_START) {
+        router.push({ pathname: '/game/', query: { id: id } });
+      }
+    });
+  };
+
+  const startGame = () => {
+    if (socket == undefined) {
+      return;
+    }
+
+    const gameToCreate: CreateGameDTO = { roomId, players, roomName };
+
+    console.log('start game sent');
+    socket?.emit(WEBSOCKET_CHANNELS.CREATE_GAME, gameToCreate);
   };
 
   return (
     <div className={styles.container}>
       <main className={styles.main}>
         <h1 className={styles.title}>Room: {roomName}</h1>
+        {admin?.userId == socket?.id && (
+          <button onClick={() => startGame()}>
+            <p>Game start</p>
+          </button>
+        )}
         <h2>RoomId: {roomId}</h2>
         {players.map((player, key) => {
           return <p key={key}>{player.username}</p>;

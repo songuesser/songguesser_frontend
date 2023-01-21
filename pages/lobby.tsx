@@ -33,6 +33,7 @@ const Lobby: NextPage = () => {
       socket.off(WEBSOCKET_CHANNELS.CREATE_ACCOUNT);
       socket.off(WEBSOCKET_CHANNELS.SET_USERNAME);
       socket.off(WEBSOCKET_CHANNELS.LIST_ROOMS);
+      socket.off(WEBSOCKET_CHANNELS.CREATE_GAME);
     };
   }, [socket]);
 
@@ -115,27 +116,33 @@ const Lobby: NextPage = () => {
       </button>
       <p>Status:</p>
       {socket && socket.active ? <p>Connected</p> : <p>Not Connected</p>}
-      {socket && socket.active && <p>Current user name: {userName ?? 'hey'}</p>}
-      <p>Enter Room Name:</p>
-      <input
-        type={'text'}
-        onChange={(e) => setNewRoomName(e.target.value)}
-        value={newRoomName}
-      />
-      <button className={styles.connectButton} onClick={() => createRoom()}>
-        <p>Create Room</p>
-      </button>
-      <h2>Open rooms:</h2>
-      {openRooms.map((room, key) => {
-        return (
-          <div key={key}>
-            <p>{room.roomName}</p>
-            <button onClick={() => pushToRoom(room.roomId)}>
-              <p>Connect</p>
-            </button>
-          </div>
-        );
-      })}
+      {socket && socket.active && <p>Current user name: {userName ?? '-'}</p>}
+      {userName && (
+        <>
+          <p>Enter Room Name:</p>
+          <input
+            type={'text'}
+            onChange={(e) => setNewRoomName(e.target.value)}
+            value={newRoomName}
+          />
+          <button className={styles.connectButton} onClick={() => createRoom()}>
+            <p>Create Room</p>
+          </button>
+          <h2>Open rooms:</h2>
+          {openRooms.map((room, key) => {
+            return (
+              <div key={key}>
+                <p>{room.roomName}</p>
+                {userName && (
+                  <button onClick={() => pushToRoom(room.roomId)}>
+                    <p>Connect</p>
+                  </button>
+                )}
+              </div>
+            );
+          })}
+        </>
+      )}
     </main>
   );
 };
