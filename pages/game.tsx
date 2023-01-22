@@ -13,6 +13,8 @@ import { SendMessageDTO } from '../dto/sendMessage';
 import { EVENTS } from '../models/enum/events';
 import { GameEvent } from '../models/game-event';
 import { Game } from '../models/game';
+import { CountDown } from '../models/countdown';
+import { GAMESTATE } from '../models/enum/game-state';
 
 const GamePage: NextPage = () => {
   const socket = useContext(SocketContext);
@@ -22,6 +24,8 @@ const GamePage: NextPage = () => {
   const [roomId, setRoomId] = useState<string>('');
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [message, setMessage] = useState<string>('');
+  const [countdown, setCountDown] = useState<number>(0);
+  const [countdownMessage, setCountDownMessage] = useState<string>('');
 
   useEffect(() => {
     const id: string = router.query.id as string;
@@ -41,6 +45,15 @@ const GamePage: NextPage = () => {
       socket.off(WEBSOCKET_CHANNELS.LIST_ROOMS);
     };
   }, [router.query, socket]);
+
+  useEffect(() => {
+    if (countdown > 0) {
+      const timeoutId = setTimeout(() => {
+        setCountDown((prevTimer) => prevTimer - 1);
+      }, 1000);
+      return () => clearTimeout(timeoutId);
+    }
+  }, [countdown]);
 
   const sendPlayerJoinedEvent = (socket: Socket, id: string) => {
     if (socket == undefined) {
@@ -72,6 +85,11 @@ const GamePage: NextPage = () => {
       case EVENTS.PLAYER_JOINED:
         const newPlayer = event.data as Player;
         setPlayers((old) => [...old, newPlayer]);
+        break;
+      case EVENTS.COUNTDOWN:
+        const countdown = event.data as CountDown;
+        setCountDown(countdown.seconds);
+        setCountDownMessage(countdown.message);
         break;
     }
   };
@@ -107,25 +125,42 @@ const GamePage: NextPage = () => {
     return filteredMessage;
   };
 
+  const displayGameStates = (state: GAMESTATE): string => {
+    switch (state) {
+      case GAMESTATE.GUESSING:
+        return 'Guessing time';
+      case GAMESTATE.SELECTING:
+        return 'Select the song';
+      case GAMESTATE.END:
+        return 'Game is over';
+    }
+  };
+
   return (
     <div className={styles.container}>
       <main className={styles.main}>
         <h1 className={styles.title}>
           Game: {gameInformation?.name ?? 'Loading...'}
         </h1>
+        <h2>{displayGameStates(gameInformation?.state)}</h2>
+        {countdown != 0 && (
+          <p>
+            {countdownMessage}: {countdown}
+          </p>
+        )}
         <h2>Players: {displayPlayerCount() ?? 'Loading...'}</h2>
         {gameInformation?.playersJoined.map((player, key) => {
           return <p key={key}>{player.username}</p>;
         })}
         <h2>Chat</h2>
-        {showMessages(messages).map((chatMsg, key) => {
-          return <p key={key}>{chatMsg.message}</p>;
-        })}
         Enter new message:
         <input onChange={(e) => setMessage(e.target.value)} value={message} />
         <button onClick={() => sendMessage()}>
           <p>Send message</p>
         </button>
+        {showMessages(messages).map((chatMsg, key) => {
+          return <p key={key}>{chatMsg.message}</p>;
+        })}
       </main>
     </div>
   );
