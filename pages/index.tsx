@@ -6,6 +6,7 @@ import { io, Socket } from 'socket.io-client';
 import { useState } from 'react';
 import { User } from '../models/user';
 import { Room } from '../models/room';
+import useSpotifyWebPlayback from 'react-spotify-web-playback';
 
 const Home: NextPage = () => {
   const [userName, setUsername] = useState<string>('');
@@ -15,9 +16,13 @@ const Home: NextPage = () => {
   const [newRoomName, setNewRoomName] = useState<string>('');
   const [clientId, setClientId] = useState<string>('');
   const [socket, setSocket] = useState<Socket | null>(null);
+  const [requestedSong, setRequestedSong] = useState<string>('');
+  const [matchingSongs, setMatchingSongs] = useState<any[]>([]);
+  const [showList, setShowList] = useState(true);
+
 
   const connectToServer = () => {
-    
+
     const newSocket = io(`http://localhost:4000`);
     setSocket(newSocket);
 
@@ -57,6 +62,29 @@ const Home: NextPage = () => {
 
       console.log("Frontend: Room Created with Name: " + roomName + " and ID: " + roomId)
     })
+
+  };
+
+  const playGivenSong = () => {
+
+    socket?.emit('playGivenSong', requestedSong);
+    console.log("sending: " + requestedSong)
+
+  };
+
+  const getMatchingSongList = () => {
+    socket?.emit('getMatchingSongList', requestedSong);
+    socket?.on('matchingSongs', (data: any[]) => {
+      setMatchingSongs(data);
+    });
+    setShowList(true);
+
+  };
+
+  const clickSong = (song: any) => {
+    console.log("clicked on: ", song.name)
+    setShowList(false);
+    socket?.emit('selectedSong', song);
 
   };
 
@@ -106,6 +134,34 @@ const Home: NextPage = () => {
         >
           <p>Create Room</p>
         </button>
+
+        <p>Request Song:</p>
+        <input
+          type={'text'}
+          onChange={(e) => setRequestedSong(e.target.value)}
+          value={requestedSong}
+        />
+        <button
+          className={styles.connectButton}
+          onClick={() => getMatchingSongList()}
+        >
+          <p>Get Matching Songs!</p>
+        </button>
+
+        <div>
+          {showList && (
+            <ul>
+              {matchingSongs.map((song, index) => (
+                <li key={index}>
+                  <button onClick={() => clickSong(song)}>
+                    {song.name} by {song.artist}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+
       </main>
 
       <footer className={styles.footer}>
