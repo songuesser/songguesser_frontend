@@ -28,6 +28,7 @@
 
 div.logo::before{
   content: url('../public/pictures/logo_skalierbar.png');
+  margin: auto;
   }
 
 .logo img{
@@ -81,6 +82,7 @@ div.logo::before{
   padding-bottom: 25px;
   letter-spacing: 1.2px;
   line-height: 30px;
+  font-weight: bold;
 }
 
 .content h1{
@@ -226,6 +228,7 @@ div.logo::before{
 div.hdmi::before{
 
   content: url('../public/pictures/hdm-logo.png');
+  padding-right: 20px;
   }
 
 .img-hdm-logo {
