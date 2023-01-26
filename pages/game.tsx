@@ -15,6 +15,8 @@ import { GameEvent } from '../models/game-event';
 import { Game } from '../models/game';
 import { CountDown } from '../models/countdown';
 import { GAMESTATE } from '../models/enum/game-state';
+import { Song } from '../models/song';
+import { SelectSongDTO } from '../dto/selectSong';
 
 const GamePage: NextPage = () => {
   const socket = useContext(SocketContext);
@@ -24,8 +26,15 @@ const GamePage: NextPage = () => {
   const [roomId, setRoomId] = useState<string>('');
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [message, setMessage] = useState<string>('');
-  const [countdown, setCountDown] = useState<number>(0);
+  const [countdownTotal, setCountDownTotal] = useState<number>(0);
+  const [countdownCurrent, setCountDownCurrent] = useState<number>(0);
   const [countdownMessage, setCountDownMessage] = useState<string>('');
+  const [requestedSong, setRequestedSong] = useState<string>('');
+  const [matchingSongs, setMatchingSongs] = useState<Song[]>([]);
+  const [selectedSong, setSelectedSong] = useState<Song | undefined>();
+  const [currentPlayer, setCurrentSelectedPlayer] = useState<
+    Player | undefined
+  >();
 
   useEffect(() => {
     const id: string = router.query.id as string;
@@ -40,20 +49,12 @@ const GamePage: NextPage = () => {
     setRoomId(id);
     listenToGameUpdates(socket);
     sendPlayerJoinedEvent(socket, id);
+    receiveMatchingSongs(socket);
 
     return () => {
       socket.off(WEBSOCKET_CHANNELS.LIST_ROOMS);
     };
   }, [router.query, socket]);
-
-  useEffect(() => {
-    if (countdown > 0) {
-      const timeoutId = setTimeout(() => {
-        setCountDown((prevTimer) => prevTimer - 1);
-      }, 1000);
-      return () => clearTimeout(timeoutId);
-    }
-  }, [countdown]);
 
   const sendPlayerJoinedEvent = (socket: Socket, id: string) => {
     if (socket == undefined) {
@@ -77,6 +78,8 @@ const GamePage: NextPage = () => {
   const handleGameEvents = (event: GameEvent) => {
     console.log('Event received of type' + event.eventType);
     setGameInformation(event.game);
+    setSelectedSong(undefined);
+
     switch (event.eventType) {
       case EVENTS.MESSAGE:
         const newMessage = event.data as ChatMessage;
@@ -88,9 +91,15 @@ const GamePage: NextPage = () => {
         break;
       case EVENTS.COUNTDOWN:
         const countdown = event.data as CountDown;
-        setCountDown(countdown.seconds);
+        console.log(countdown);
+        setCountDownTotal(countdown.totalTime);
+        setCountDownCurrent(countdown.currentTime);
         setCountDownMessage(countdown.message);
+        setCurrentSelectedPlayer(countdown.currentlySelectedPlayer);
         break;
+      case EVENTS.END:
+        setCountDownTotal(0);
+        setCountDownCurrent(0);
     }
   };
 
@@ -103,6 +112,7 @@ const GamePage: NextPage = () => {
       message: message,
       roomId: roomId,
       userId: socket.id,
+      userIdOfPersonThatSelectedSong: currentPlayer?.userId ?? '',
     };
 
     socket?.emit(WEBSOCKET_CHANNELS.IN_GAME_CHAT, sendMessageDTO);
@@ -125,7 +135,7 @@ const GamePage: NextPage = () => {
     return filteredMessage;
   };
 
-  const displayGameStates = (state: GAMESTATE): string => {
+  const displayGameStates = (state?: GAMESTATE): string => {
     switch (state) {
       case GAMESTATE.GUESSING:
         return 'Guessing time';
@@ -133,7 +143,38 @@ const GamePage: NextPage = () => {
         return 'Select the song';
       case GAMESTATE.END:
         return 'Game is over';
+      default:
+        return '';
     }
+  };
+
+  const searchForSong = () => {
+    if (socket == undefined) {
+      return;
+    }
+
+    socket?.emit(WEBSOCKET_CHANNELS.MATCHING_SONGS, requestedSong);
+  };
+
+  const receiveMatchingSongs = (socket: Socket) => {
+    socket?.on(WEBSOCKET_CHANNELS.MATCHING_SONGS, (data: Song[]) => {
+      setMatchingSongs(data);
+    });
+  };
+
+  const selectSong = (song: Song) => {
+    if (socket == undefined) {
+      return;
+    }
+    setSelectedSong(song);
+
+    const selectSongDTO: SelectSongDTO = {
+      song: song,
+      gameId: gameInformation?.gameId ?? '',
+      userId: socket.id,
+    };
+
+    socket?.emit(WEBSOCKET_CHANNELS.SELECT_SONG, selectSongDTO);
   };
 
   return (
@@ -143,15 +184,36 @@ const GamePage: NextPage = () => {
           Game: {gameInformation?.name ?? 'Loading...'}
         </h1>
         <h2>{displayGameStates(gameInformation?.state)}</h2>
-        {countdown != 0 && (
+        {countdownCurrent != 0 && (
           <p>
-            {countdownMessage}: {countdown}
+            {countdownMessage}: {countdownCurrent + ' / ' + countdownTotal}
           </p>
         )}
         <h2>Players: {displayPlayerCount() ?? 'Loading...'}</h2>
         {gameInformation?.playersJoined.map((player, key) => {
           return <p key={key}>{player.username}</p>;
         })}
+        {gameInformation?.state == GAMESTATE.SELECTING && (
+          <>
+            <h2>Search for your song</h2>
+            <input
+              onChange={(e) => setRequestedSong(e.target.value)}
+              value={requestedSong}
+            />
+            <button onClick={() => searchForSong()}>
+              Search for matching songs
+            </button>
+            <ul>
+              {matchingSongs.map((song, index) => (
+                <li key={index}>
+                  <button onClick={() => selectSong(song)}>
+                    {song.name} by {song.artist}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
         <h2>Chat</h2>
         Enter new message:
         <input onChange={(e) => setMessage(e.target.value)} value={message} />
