@@ -7,7 +7,7 @@ import { JoinRoomDTO } from '../dto/joinRoom';
 import { RoomsList } from '../dto/listRooms';
 import { WEBSOCKET_CHANNELS } from '../models/enum/websocket_channels';
 import { Player } from '../models/players';
-import styles from '../styles/Home.module.css';
+import styles from '../styles/RoomPage.module.css';
 import { User } from '../models/user';
 import { EVENTS } from '../models/enum/events';
 import { CreateGameDTO } from '../dto/createGame';
@@ -93,15 +93,26 @@ const RoomsPage: NextPage = () => {
     <div className={styles.container}>
       <main className={styles.main}>
         <h1 className={styles.title}>Room: {roomName}</h1>
-        {admin?.userId == socket?.id && (
-          <button onClick={() => startGame()}>
-            <p>Game start</p>
-          </button>
-        )}
-        <h2>RoomId: {roomId}</h2>
-        {players.map((player, key) => {
-          return <p key={key}>{player.username}</p>;
-        })}
+
+        <div className={styles.form}>
+          <h2 className={styles.detailsInfo}>RoomId: {roomId}</h2>
+          {admin?.userId == socket?.id && (
+            <button
+              className={styles.connectButton}
+              onClick={() => startGame()}
+            >
+              <p>Game start</p>
+            </button>
+          )}
+          <h3 className={styles.detailsInfo}>Players: </h3>
+          {players.map((player, key) => {
+            return (
+              <p className={styles.player} key={key}>
+                {player.username}
+              </p>
+            );
+          })}
+        </div>
       </main>
     </div>
   );

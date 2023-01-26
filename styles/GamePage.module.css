@@ -1,0 +1,129 @@
+.container {
+  background-color: #faf9f6;
+  padding: 0 2rem;
+  color: black;
+}
+
+.connectButton {
+  margin-top: 1rem;
+  padding: 0rem 4rem;
+}
+
+.main {
+  min-height: 100vh;
+  padding: 4rem 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: #faf9f6;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  margin-left: 1rem;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.8) 50%,
+    rgba(0, 0, 0, 0.8) 50%
+  );
+  border-radius: 25px;
+  align-items: center;
+  text-align: center;
+  padding: 4rem 2rem;
+  margin-bottom: 1rem;
+  color: white;
+}
+
+.form h2 {
+  width: 100%;
+  text-align: center;
+  color: #3e8c59;
+  font-size: 22px;
+  background-color: #f2f2f2;
+  border-radius: 25px;
+  margin: 2px;
+  padding: 1rem 1.5rem;
+}
+
+.form input {
+  width: 240px;
+  height: 35px;
+  background: transparent;
+  border-bottom: 1px solid #3e8c59;
+  border-top: none;
+  border-right: none;
+  border-left: none;
+  color: #fff;
+  font-size: 15px;
+  letter-spacing: 1px;
+  margin-top: 30px;
+  text-align: left;
+}
+
+.form input:focus {
+  outline: none;
+}
+
+.bigContainer {
+  width: 100%;
+
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+.statusInfo {
+  color: #3e8c59;
+  border-color: #3e8c59;
+  text-align: center;
+  border-radius: 25px;
+  padding: 0rem 2rem;
+  position: absolute;
+  top: 0%;
+  right: 1%;
+}
+
+.detailsInfo {
+  text-align: center;
+  color: #3e8c59;
+  font-size: 14px;
+  background-color: #f2f2f2;
+  border-radius: 25px;
+  margin: 2px;
+  padding: 1rem 5rem;
+  color: black;
+  margin-top: 1rem;
+}
+
+.player {
+  width: 10rem;
+  text-align: center;
+  color: #3e8c59;
+  font-size: 14px;
+  background-color: #f2f2f2;
+  border-radius: 25px;
+  margin: 2px;
+  padding: 1rem 2rem;
+  color: black;
+  margin-top: 1rem;
+}
+
+.music {
+  width: 15rem;
+  text-align: center;
+  color: #3e8c59;
+  font-size: 14px;
+  background-color: #f2f2f2;
+  border-radius: 25px;
+  padding: 1rem 2rem;
+  color: black;
+  margin-top: 1rem;
+}
+
+.bigItemsContainer {
+  display: flex;
+  flex-direction: row;
+}

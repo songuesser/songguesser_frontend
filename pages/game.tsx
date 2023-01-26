@@ -3,11 +3,9 @@ import { useRouter } from 'next/router';
 import { useContext, useEffect, useState } from 'react';
 import { Socket } from 'socket.io-client';
 import { SocketContext } from '../context/socket';
-import { JoinRoomDTO } from '../dto/joinRoom';
-import { RoomsList } from '../dto/listRooms';
 import { WEBSOCKET_CHANNELS } from '../models/enum/websocket_channels';
 import { Player } from '../models/players';
-import styles from '../styles/Home.module.css';
+import styles from '../styles/GamePage.module.css';
 import { ChatMessage } from '../models/chatmessage';
 import { SendMessageDTO } from '../dto/sendMessage';
 import { EVENTS } from '../models/enum/events';
@@ -183,46 +181,69 @@ const GamePage: NextPage = () => {
         <h1 className={styles.title}>
           Game: {gameInformation?.name ?? 'Loading...'}
         </h1>
-        <h2>{displayGameStates(gameInformation?.state)}</h2>
-        {countdownCurrent != 0 && (
-          <p>
-            {countdownMessage}: {countdownCurrent + ' / ' + countdownTotal}
-          </p>
-        )}
-        <h2>Players: {displayPlayerCount() ?? 'Loading...'}</h2>
-        {gameInformation?.playersJoined.map((player, key) => {
-          return <p key={key}>{player.username}</p>;
-        })}
-        {gameInformation?.state == GAMESTATE.SELECTING && (
-          <>
-            <h2>Search for your song</h2>
-            <input
-              onChange={(e) => setRequestedSong(e.target.value)}
-              value={requestedSong}
-            />
-            <button onClick={() => searchForSong()}>
-              Search for matching songs
-            </button>
-            <ul>
-              {matchingSongs.map((song, index) => (
-                <li key={index}>
-                  <button onClick={() => selectSong(song)}>
-                    {song.name} by {song.artist}
-                  </button>
-                </li>
+        <div className={styles.form}>
+          <h2>{displayGameStates(gameInformation?.state)}</h2>
+          {countdownCurrent != 0 && (
+            <p>
+              {countdownMessage}: {countdownCurrent + ' / ' + countdownTotal}
+            </p>
+          )}
+        </div>
+        <div className={styles.bigItemsContainer}>
+          <div className={styles.form}>
+            <h2>Players: {displayPlayerCount() ?? 'Loading...'}</h2>
+            {gameInformation?.playersJoined.map((player, key) => {
+              return (
+                <p className={styles.player} key={key}>
+                  {player.username}
+                </p>
+              );
+            })}
+          </div>
+
+          {gameInformation?.state == GAMESTATE.SELECTING && (
+            <div className={styles.form}>
+              <h2>Search for your song</h2>
+              <input
+                onChange={(e) => setRequestedSong(e.target.value)}
+                value={requestedSong}
+              />
+              <button
+                className={styles.connectButton}
+                onClick={() => searchForSong()}
+              >
+                Search for matching songs
+              </button>
+
+              {matchingSongs.map((song, key) => (
+                <button
+                  key={key}
+                  className={styles.music}
+                  onClick={() => selectSong(song)}
+                >
+                  {song.name} by {song.artist}
+                </button>
               ))}
-            </ul>
-          </>
-        )}
-        <h2>Chat</h2>
-        Enter new message:
-        <input onChange={(e) => setMessage(e.target.value)} value={message} />
-        <button onClick={() => sendMessage()}>
-          <p>Send message</p>
-        </button>
-        {showMessages(messages).map((chatMsg, key) => {
-          return <p key={key}>{chatMsg.message}</p>;
-        })}
+            </div>
+          )}
+
+          <div className={styles.form}>
+            <h2>Chat</h2>
+            <div className={styles.chatContainer}>
+              Enter new message:
+              <input
+                onChange={(e) => setMessage(e.target.value)}
+                value={message}
+              />
+              <button onClick={() => sendMessage()}>
+                <p>Send message</p>
+              </button>
+              {showMessages(messages).map((chatMsg, key) => {
+                return <p key={key}>{chatMsg.message}</p>;
+              })}
+            </div>
+          </div>
+        </div>
       </main>
     </div>
   );

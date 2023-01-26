@@ -1,12 +1,11 @@
 import type { NextPage } from 'next';
 import { useContext, useEffect, useState } from 'react';
 import { Socket } from 'socket.io-client';
-import Home from '.';
 import { SocketContext } from '../context/socket';
 import { WEBSOCKET_CHANNELS } from '../models/enum/websocket_channels';
 import { Room } from '../models/room';
 import { User } from '../models/user';
-import styles from '../styles/Home.module.css';
+import styles from '../styles/LobbyPage.module.css';
 import { useRouter } from 'next/router';
 import { RoomsList } from '../dto/listRooms';
 
@@ -101,48 +100,68 @@ const Lobby: NextPage = () => {
 
   return (
     <main className={styles.main}>
+      <p className={styles.statusInfo}>
+        {'Status: ' + socket?.active ? <p>Connected</p> : <p>Not Connected</p>}
+      </p>
+
       <h1 className={styles.title}>Create or join game!</h1>
-      <p>Enter username below:</p>
-      <input
-        type={'text'}
-        onChange={(e) => setNewUsername(e.target.value)}
-        value={newUserName}
-      />
-      <button
-        className={styles.connectButton}
-        onClick={() => (userName == '' ? createAccount() : updateUsername())}
-      >
-        <p>{userName == '' ? 'Create account' : 'Update username'}</p>
-      </button>
-      <p>Status:</p>
-      {socket && socket.active ? <p>Connected</p> : <p>Not Connected</p>}
-      {socket && socket.active && <p>Current user name: {userName ?? '-'}</p>}
-      {userName && (
-        <>
-          <p>Enter Room Name:</p>
+      <div className={styles.bigContainer}>
+        <div className={styles.form}>
+          <h2>Enter details</h2>
+          <p className={styles.detailsInfo}>Enter username below:</p>
+
+          <input
+            className={styles.smallTexts}
+            type={'text'}
+            onChange={(e) => setNewUsername(e.target.value)}
+            value={newUserName}
+            placeholder="Enter username"
+          />
+          <button
+            className={styles.connectButton}
+            onClick={() =>
+              userName == '' ? createAccount() : updateUsername()
+            }
+          >
+            <p>{userName == '' ? 'Create account' : 'Update username'}</p>
+          </button>
+          <p className={styles.detailsInfo}>
+            {socket && socket.active && (
+              <p>Current user name: {userName == '' ? '' : userName}</p>
+            )}
+          </p>
           <input
             type={'text'}
             onChange={(e) => setNewRoomName(e.target.value)}
+            placeholder="Enter Room Name"
             value={newRoomName}
           />
           <button className={styles.connectButton} onClick={() => createRoom()}>
-            <p>Create Room</p>
+            Create Room
           </button>
+        </div>
+        <div className={styles.form}>
           <h2>Open rooms:</h2>
-          {openRooms.map((room, key) => {
-            return (
-              <div key={key}>
-                <p>{room.roomName}</p>
-                {userName && (
-                  <button onClick={() => pushToRoom(room.roomId)}>
-                    <p>Connect</p>
-                  </button>
-                )}
-              </div>
-            );
-          })}
-        </>
-      )}
+          {userName == '' ? (
+            <p className={styles.detailsInfo}>Create an account first!</p>
+          ) : (
+            <>
+              {openRooms.map((room, key) => {
+                return (
+                  <div key={key}>
+                    <p>{room.roomName}</p>
+                    {userName && (
+                      <button onClick={() => pushToRoom(room.roomId)}>
+                        <p>Connect</p>
+                      </button>
+                    )}
+                  </div>
+                );
+              })}
+            </>
+          )}
+        </div>
+      </div>
     </main>
   );
 };
