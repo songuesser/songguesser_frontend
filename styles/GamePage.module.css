@@ -37,6 +37,24 @@
   color: white;
 }
 
+.miniForm {
+  display: flex;
+  flex-direction: column;
+  margin-left: 1rem;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.8) 50%,
+    rgba(0, 0, 0, 0.8) 50%
+  );
+  border-radius: 25px;
+  align-items: center;
+  text-align: center;
+  padding: 1rem 2rem;
+  height: 50%;
+  color: white;
+  margin-bottom: 1rem;
+}
+
 .form h2 {
   width: 100%;
   text-align: center;
@@ -126,4 +144,28 @@
 .bigItemsContainer {
   display: flex;
   flex-direction: row;
+}
+
+.musicContainer {
+  display: flex;
+  flex-direction: column;
+}
+
+.hiderContainer {
+  position: relative;
+}
+
+.hideOne {
+  position: absolute;
+  background-color: #f2f2f2;
+  width: 21rem;
+  height: 2rem;
+}
+
+.hideTwo {
+  position: absolute;
+  bottom: 0%;
+  background-color: #f2f2f2;
+  width: 18.2rem;
+  height: 4rem;
 }

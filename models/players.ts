@@ -1,9 +1,11 @@
+import { Song } from './song';
 import { User } from './user';
 
 class Player extends User {
-  point!: number;
-  selectedSong!: string;
-  guessedSong!: string;
+  points!: number;
+  selectedSong!: Song | undefined;
+  guessedSong!: Song | undefined;
+  hasGuessed!: boolean;
 }
 
 export { Player };

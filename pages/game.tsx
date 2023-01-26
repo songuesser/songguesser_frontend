@@ -15,6 +15,8 @@ import { CountDown } from '../models/countdown';
 import { GAMESTATE } from '../models/enum/game-state';
 import { Song } from '../models/song';
 import { SelectSongDTO } from '../dto/selectSong';
+import Spotify from 'react-spotify-embed';
+import { getQueriesForElement } from '@testing-library/react';
 
 const GamePage: NextPage = () => {
   const socket = useContext(SocketContext);
@@ -89,7 +91,7 @@ const GamePage: NextPage = () => {
         break;
       case EVENTS.COUNTDOWN:
         const countdown = event.data as CountDown;
-        console.log(countdown);
+
         setCountDownTotal(countdown.totalTime);
         setCountDownCurrent(countdown.currentTime);
         setCountDownMessage(countdown.message);
@@ -138,7 +140,7 @@ const GamePage: NextPage = () => {
       case GAMESTATE.GUESSING:
         return 'Guessing time';
       case GAMESTATE.SELECTING:
-        return 'Select the song';
+        return 'Select a song';
       case GAMESTATE.END:
         return 'Game is over';
       default:
@@ -175,6 +177,27 @@ const GamePage: NextPage = () => {
     socket?.emit(WEBSOCKET_CHANNELS.SELECT_SONG, selectSongDTO);
   };
 
+  const getURI = (): string => {
+    if (currentPlayer == undefined) {
+      return '';
+    }
+
+    console.log(gameInformation);
+
+    console.log(gameInformation?.playersJoined);
+    console.log(currentPlayer.userId);
+
+    const playersSelectedSong = gameInformation?.playersJoined.find(
+      (player) => currentPlayer.userId == player.userId,
+    )?.selectedSong;
+
+    const trackId = playersSelectedSong?.uri.substring(
+      playersSelectedSong?.uri.indexOf(':track:') + ':track:'.length,
+    );
+
+    return trackId ?? '';
+  };
+
   return (
     <div className={styles.container}>
       <main className={styles.main}>
@@ -200,7 +223,24 @@ const GamePage: NextPage = () => {
               );
             })}
           </div>
-
+          {gameInformation?.state == GAMESTATE.GUESSING && (
+            <div className={styles.musicContainer}>
+              <div className={styles.miniForm}>
+                <h2>Guess song in the chat</h2>
+                {getURI() === '' && <p></p>}
+              </div>
+              {getURI() != '' && (
+                <div className={styles.hiderContainer}>
+                  <div className={styles.hideOne} />
+                  <div className={styles.hideTwo} />
+                  <Spotify
+                    wide
+                    link={'https://open.spotify.com/track/' + getURI()}
+                  />
+                </div>
+              )}
+            </div>
+          )}
           {gameInformation?.state == GAMESTATE.SELECTING && (
             <div className={styles.form}>
               <h2>Search for your song</h2>
