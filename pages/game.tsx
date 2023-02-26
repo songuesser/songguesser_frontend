@@ -270,14 +270,15 @@ const GamePage: NextPage = () => {
           <div className={styles.form}>
             <h2>Chat</h2>
             <div className={styles.chatContainer}>
-              Enter new message:
               <input
                 onChange={(e) => setMessage(e.target.value)}
                 value={message}
-              />
+                placeholder="Enter new message"              />
+              <div className={styles.chatButton}>  
               <button onClick={() => sendMessage()}>
                 <p>Send message</p>
               </button>
+              </div>
               {showMessages(messages).map((chatMsg, key) => {
                 return <p key={key}>{chatMsg.message}</p>;
               })}

@@ -1,6 +1,19 @@
 .container {
-  background-color: #faf9f6;
-  padding: 0 2rem;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.3) 50%,
+    rgba(0, 0, 0, 0.3) 50%
+  ),
+  url('../public/pictures/songguesser_game_background.png');
+  background-position: center;
+  background-size: cover;
+  min-height: 100vh;
+  padding: 4rem 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 .connectButton {
@@ -16,7 +29,7 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background-color: #faf9f6;
+  background-color: transparent; 
 }
 
 .detailsInfo {
