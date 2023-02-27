@@ -42,7 +42,6 @@ const RoomsPage: NextPage = () => {
   }, [router.query, socket]);
 
   const joinRoom = (id: string, socket: Socket) => {
-    console.log('JOIN ROOM');
     const joinRoomDTO: JoinRoomDTO = {
       roomId: id,
     };
@@ -52,12 +51,8 @@ const RoomsPage: NextPage = () => {
 
   const listenToRoomUpdates = (id: string, socket: Socket) => {
     socket.on(WEBSOCKET_CHANNELS.LIST_ROOMS, (data: RoomsList) => {
-      console.log('ROOM UDPATES');
-
       const { rooms } = data;
-      console.log(rooms);
       const room = rooms.find((room) => room.roomId == id);
-      console.log(room);
       if (room == undefined) {
         return;
       }
@@ -69,9 +64,7 @@ const RoomsPage: NextPage = () => {
   };
 
   const listenToGameStart = (id: string, socket: Socket) => {
-    console.log('Listening to game start');
     socket.on(WEBSOCKET_CHANNELS.CREATE_GAME, (event: EVENTS) => {
-      console.log('Game start event received');
       if (event == EVENTS.GAME_START) {
         router.push({ pathname: '/game/', query: { id: id } });
       }
@@ -85,35 +78,39 @@ const RoomsPage: NextPage = () => {
 
     const gameToCreate: CreateGameDTO = { roomId, players, roomName };
 
-    console.log('start game sent');
     socket?.emit(WEBSOCKET_CHANNELS.CREATE_GAME, gameToCreate);
   };
 
   return (
     <div className={styles.container}>
-      <main className={styles.main}>
-        <h1 className={styles.title}>Room: {roomName}</h1>
+      <div className={styles.homebutton}>
+        <a href="http://localhost:3000">Home</a>
+      </div>
+      <div className={styles.home}>
+        <main className={styles.main}>
+          <h1 className={styles.title}>Room: {roomName}</h1>
 
-        <div className={styles.form}>
-          <h2 className={styles.detailsInfo}>RoomId: {roomId}</h2>
-          {admin?.userId == socket?.id && (
-            <button
-              className={styles.connectButton}
-              onClick={() => startGame()}
-            >
-              <p>Game start</p>
-            </button>
-          )}
-          <h3 className={styles.detailsInfo}>Players: </h3>
-          {players.map((player, key) => {
-            return (
-              <p className={styles.player} key={key}>
-                {player.username}
-              </p>
-            );
-          })}
-        </div>
-      </main>
+          <div className={styles.form}>
+            <h2 className={styles.detailsInfo}>RoomId: {roomId}</h2>
+            {admin?.userId == socket?.id && (
+              <button
+                className={styles.connectButton}
+                onClick={() => startGame()}
+              >
+                <p>Game start</p>
+              </button>
+            )}
+            <h3 className={styles.detailsInfo}>Players: </h3>
+            {players.map((player, key) => {
+              return (
+                <p className={styles.player} key={key}>
+                  {player.username}
+                </p>
+              );
+            })}
+          </div>
+        </main>
+      </div>
     </div>
   );
 };

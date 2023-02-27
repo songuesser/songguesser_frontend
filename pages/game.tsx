@@ -16,7 +16,7 @@ import { GAMESTATE } from '../models/enum/game-state';
 import { Song } from '../models/song';
 import { SelectSongDTO } from '../dto/selectSong';
 import Spotify from 'react-spotify-embed';
-import { getQueriesForElement } from '@testing-library/react';
+import { LeaveRoomDTO } from '../dto/leaveRoom';
 
 const GamePage: NextPage = () => {
   const socket = useContext(SocketContext);
@@ -31,7 +31,6 @@ const GamePage: NextPage = () => {
   const [countdownMessage, setCountDownMessage] = useState<string>('');
   const [requestedSong, setRequestedSong] = useState<string>('');
   const [matchingSongs, setMatchingSongs] = useState<Song[]>([]);
-  const [selectedSong, setSelectedSong] = useState<Song | undefined>();
   const [currentPlayer, setCurrentSelectedPlayer] = useState<
     Player | undefined
   >();
@@ -62,7 +61,6 @@ const GamePage: NextPage = () => {
     }
 
     const assingPlayerDTO = { userId: socket.id, roomId: id };
-    console.log('Player join');
     socket.emit(WEBSOCKET_CHANNELS.IN_GAME_JOIN_PLAYER, assingPlayerDTO);
   };
 
@@ -76,9 +74,7 @@ const GamePage: NextPage = () => {
   };
 
   const handleGameEvents = (event: GameEvent) => {
-    console.log('Event received of type' + event.eventType);
     setGameInformation(event.game);
-    setSelectedSong(undefined);
 
     switch (event.eventType) {
       case EVENTS.MESSAGE:
@@ -100,6 +96,7 @@ const GamePage: NextPage = () => {
       case EVENTS.END:
         setCountDownTotal(0);
         setCountDownCurrent(0);
+        break;
     }
   };
 
@@ -166,7 +163,6 @@ const GamePage: NextPage = () => {
     if (socket == undefined) {
       return;
     }
-    setSelectedSong(song);
 
     const selectSongDTO: SelectSongDTO = {
       song: song,
@@ -182,11 +178,6 @@ const GamePage: NextPage = () => {
       return '';
     }
 
-    console.log(gameInformation);
-
-    console.log(gameInformation?.playersJoined);
-    console.log(currentPlayer.userId);
-
     const playersSelectedSong = gameInformation?.playersJoined.find(
       (player) => currentPlayer.userId == player.userId,
     )?.selectedSong;
@@ -196,6 +187,20 @@ const GamePage: NextPage = () => {
     );
 
     return trackId ?? '';
+  };
+
+  const leaveRoom = (): void => {
+    const leavingPlayer = players.find((user) => user.userId == socket?.id);
+
+    let leaveRoomDTO: LeaveRoomDTO;
+    if (leavingPlayer !== undefined) {
+      leaveRoomDTO = {
+        player: leavingPlayer,
+        roomId: roomId,
+      };
+      socket?.emit(WEBSOCKET_CHANNELS.LEAVE_ROOM, leaveRoomDTO);
+      router.push({ pathname: '/lobby' });
+    }
   };
 
   return (
@@ -222,6 +227,12 @@ const GamePage: NextPage = () => {
                 </p>
               );
             })}
+            <button
+              className={styles.connectButton}
+              onClick={() => leaveRoom()}
+            >
+              Leave room
+            </button>
           </div>
           {gameInformation?.state == GAMESTATE.GUESSING && (
             <div className={styles.musicContainer}>
@@ -270,14 +281,16 @@ const GamePage: NextPage = () => {
           <div className={styles.form}>
             <h2>Chat</h2>
             <div className={styles.chatContainer}>
-              Enter new message:
               <input
                 onChange={(e) => setMessage(e.target.value)}
                 value={message}
+                placeholder="Enter new message"
               />
-              <button onClick={() => sendMessage()}>
-                <p>Send message</p>
-              </button>
+              <div className={styles.chatButton}>
+                <button onClick={() => sendMessage()}>
+                  <p>Send message</p>
+                </button>
+              </div>
               {showMessages(messages).map((chatMsg, key) => {
                 return <p key={key}>{chatMsg.message}</p>;
               })}
