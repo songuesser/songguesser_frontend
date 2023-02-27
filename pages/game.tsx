@@ -16,7 +16,6 @@ import { GAMESTATE } from '../models/enum/game-state';
 import { Song } from '../models/song';
 import { SelectSongDTO } from '../dto/selectSong';
 import Spotify from 'react-spotify-embed';
-import { getQueriesForElement } from '@testing-library/react';
 import { LeaveRoomDTO } from '../dto/leaveRoom';
 
 const GamePage: NextPage = () => {
@@ -201,7 +200,7 @@ const GamePage: NextPage = () => {
   const leaveRoom = (): void => {
     const leavingPlayer = players.find((user) => user.userId == socket?.id);
 
-    var leaveRoomDTO: LeaveRoomDTO;
+    let leaveRoomDTO: LeaveRoomDTO;
     if (leavingPlayer !== undefined) {
       leaveRoomDTO = {
         player: leavingPlayer,

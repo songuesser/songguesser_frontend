@@ -50,7 +50,7 @@ const Home: NextPage = () => {
           </p>
         </div>
         <div className={styles.form}>
-          <h2>Let's go</h2>
+          <h2>Let&apos;s go</h2>
 
           <button
             className={styles.connectButton}
