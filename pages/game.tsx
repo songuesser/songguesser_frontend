@@ -31,7 +31,6 @@ const GamePage: NextPage = () => {
   const [countdownMessage, setCountDownMessage] = useState<string>('');
   const [requestedSong, setRequestedSong] = useState<string>('');
   const [matchingSongs, setMatchingSongs] = useState<Song[]>([]);
-  const [selectedSong, setSelectedSong] = useState<Song | undefined>();
   const [currentPlayer, setCurrentSelectedPlayer] = useState<
     Player | undefined
   >();
@@ -76,7 +75,6 @@ const GamePage: NextPage = () => {
 
   const handleGameEvents = (event: GameEvent) => {
     setGameInformation(event.game);
-    setSelectedSong(undefined);
 
     switch (event.eventType) {
       case EVENTS.MESSAGE:
@@ -94,11 +92,6 @@ const GamePage: NextPage = () => {
         setCountDownCurrent(countdown.currentTime);
         setCountDownMessage(countdown.message);
         setCurrentSelectedPlayer(countdown.currentlySelectedPlayer);
-        break;
-      case EVENTS.PLAYER_LEFT:
-        const leavingPlayer = event.data as Player;
-        //cleanUpLeavingPlayer(leavingPlayer);
-        //displayPlayerCount();
         break;
       case EVENTS.END:
         setCountDownTotal(0);
@@ -170,7 +163,6 @@ const GamePage: NextPage = () => {
     if (socket == undefined) {
       return;
     }
-    setSelectedSong(song);
 
     const selectSongDTO: SelectSongDTO = {
       song: song,
@@ -208,20 +200,6 @@ const GamePage: NextPage = () => {
       };
       socket?.emit(WEBSOCKET_CHANNELS.LEAVE_ROOM, leaveRoomDTO);
       router.push({ pathname: '/lobby' });
-    }
-  };
-
-  const cleanUpLeavingPlayer = (leavingPlayer: Player): void => {
-    const playersIndex = players.findIndex(
-      (user) => user.userId == leavingPlayer.userId,
-    );
-    const playersJoinedIndex = gameInformation?.playersJoined.findIndex(
-      (user) => user.userId == leavingPlayer.userId,
-    );
-
-    players.splice(playersIndex, 1);
-    if (playersJoinedIndex !== undefined) {
-      gameInformation?.playersJoined.splice(playersJoinedIndex, 1);
     }
   };
 

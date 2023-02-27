@@ -26,14 +26,6 @@ const Lobby: NextPage = () => {
       return;
     }
 
-    /*
-    const userNameCookie = getCookie("userName");
-    if(userNameCookie != undefined){
-      setUsername(userNameCookie);
-      setNewUsername(userNameCookie);
-    }
-    */
-
     listenToRoomUpdates(socket);
 
     return () => {
@@ -97,14 +89,6 @@ const Lobby: NextPage = () => {
 
   const pushToRoom = (roomId: string) => {
     router.push({ pathname: '/room/', query: { id: roomId } });
-  };
-
-  const getCookie = (name: string) => {
-    const value = '; ' + document.cookie;
-    const parts = value.split('; ' + name + '=');
-    if (parts.length === 2) {
-      return parts.pop()?.split(';').shift();
-    }
   };
 
   return (
