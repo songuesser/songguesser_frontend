@@ -63,7 +63,6 @@ const GamePage: NextPage = () => {
     }
 
     const assingPlayerDTO = { userId: socket.id, roomId: id };
-    console.log('Player join');
     socket.emit(WEBSOCKET_CHANNELS.IN_GAME_JOIN_PLAYER, assingPlayerDTO);
   };
 
@@ -77,7 +76,6 @@ const GamePage: NextPage = () => {
   };
 
   const handleGameEvents = (event: GameEvent) => {
-    console.log('Event received of type' + event.eventType);
     setGameInformation(event.game);
     setSelectedSong(undefined);
 
@@ -99,16 +97,14 @@ const GamePage: NextPage = () => {
         setCurrentSelectedPlayer(countdown.currentlySelectedPlayer);
         break;
       case EVENTS.PLAYER_LEFT:
-        const leavingPlayer = event.data as Player
+        const leavingPlayer = event.data as Player;
         //cleanUpLeavingPlayer(leavingPlayer);
         //displayPlayerCount();
         break;
       case EVENTS.END:
-          setCountDownTotal(0);
-          setCountDownCurrent(0);
+        setCountDownTotal(0);
+        setCountDownCurrent(0);
         break;
-
-
     }
   };
 
@@ -191,11 +187,6 @@ const GamePage: NextPage = () => {
       return '';
     }
 
-    console.log(gameInformation);
-
-    console.log(gameInformation?.playersJoined);
-    console.log(currentPlayer.userId);
-
     const playersSelectedSong = gameInformation?.playersJoined.find(
       (player) => currentPlayer.userId == player.userId,
     )?.selectedSong;
@@ -208,12 +199,7 @@ const GamePage: NextPage = () => {
   };
 
   const leaveRoom = (): void => {
-
-    console.log("Current Players (leaveROom ): " + JSON.stringify(players))
-
-    const leavingPlayer = players.find(
-      (user) => user.userId == socket?.id,
-    );
+    const leavingPlayer = players.find((user) => user.userId == socket?.id);
 
     var leaveRoomDTO: LeaveRoomDTO;
     if (leavingPlayer !== undefined) {
@@ -222,32 +208,23 @@ const GamePage: NextPage = () => {
         roomId: roomId,
       };
       socket?.emit(WEBSOCKET_CHANNELS.LEAVE_ROOM, leaveRoomDTO);
-      router.push({ pathname: '/lobby' })
-    };
-    
-  }
-
+      router.push({ pathname: '/lobby' });
+    }
+  };
 
   const cleanUpLeavingPlayer = (leavingPlayer: Player): void => {
-
-    console.log("Current Players: " + JSON.stringify(players))
     const playersIndex = players.findIndex(
       (user) => user.userId == leavingPlayer.userId,
     );
     const playersJoinedIndex = gameInformation?.playersJoined.findIndex(
       (user) => user.userId == leavingPlayer.userId,
     );
-   
-    console.log("Leaving Player ID: " + leavingPlayer.userId)
-    console.log("Player " + players[playersIndex].username + " has left the game.")
-    players.splice(playersIndex, 1)
+
+    players.splice(playersIndex, 1);
     if (playersJoinedIndex !== undefined) {
-      gameInformation?.playersJoined.splice(playersJoinedIndex, 1)
+      gameInformation?.playersJoined.splice(playersJoinedIndex, 1);
     }
-  }
-
-
-
+  };
 
   return (
     <div className={styles.container}>
@@ -273,7 +250,7 @@ const GamePage: NextPage = () => {
                 </p>
               );
             })}
-             <button
+            <button
               className={styles.connectButton}
               onClick={() => leaveRoom()}
             >
@@ -330,11 +307,12 @@ const GamePage: NextPage = () => {
               <input
                 onChange={(e) => setMessage(e.target.value)}
                 value={message}
-                placeholder="Enter new message"              />
-              <div className={styles.chatButton}>  
-              <button onClick={() => sendMessage()}>
-                <p>Send message</p>
-              </button>
+                placeholder="Enter new message"
+              />
+              <div className={styles.chatButton}>
+                <button onClick={() => sendMessage()}>
+                  <p>Send message</p>
+                </button>
               </div>
               {showMessages(messages).map((chatMsg, key) => {
                 return <p key={key}>{chatMsg.message}</p>;

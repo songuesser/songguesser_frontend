@@ -254,7 +254,7 @@
   color: #3e8c59;
   cursor: pointer;
   background: #fff;
-  transition: color,border-color ease 0.3s;
+  transition: color, border-color ease 0.3s;
   border-radius: 2em;
 }
 .homebutton a:hover {

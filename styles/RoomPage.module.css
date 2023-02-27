@@ -1,10 +1,10 @@
 .home {
   background: linear-gradient(
-    to top,
-    rgba(0, 0, 0, 0.3) 50%,
-    rgba(0, 0, 0, 0.3) 50%
-  ),
-  url('../public/pictures/songguesser_game_background.png');
+      to top,
+      rgba(0, 0, 0, 0.3) 50%,
+      rgba(0, 0, 0, 0.3) 50%
+    ),
+    url('../public/pictures/songguesser_game_background.png');
   background-position: center;
   background-size: cover;
   min-height: 100vh;
@@ -19,10 +19,10 @@
 .connectButton {
   width: 100%;
   height: 100%;
-  background: #3e8c59;  
+  background: #3e8c59;
   border: 2px solid #3e8c59;
   border-radius: 25px;
-  color:#fff;
+  color: #fff;
   font-size: 15px;
 
   margin-top: 1rem;
@@ -39,7 +39,7 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background-color: transparent; 
+  background-color: transparent;
 }
 
 .detailsInfo {
@@ -176,7 +176,7 @@
   color: #3e8c59;
   cursor: pointer;
   background: #fff;
-  transition: color,border-color ease 0.3s;
+  transition: color, border-color ease 0.3s;
   border-radius: 2em;
 }
 .homebutton a:hover {
