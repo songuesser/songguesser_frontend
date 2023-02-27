@@ -3,8 +3,8 @@
 .home {
   background: linear-gradient(
       to top,
-      rgba(0, 0, 0, 0.5) 50%,
-      rgba(0, 0, 0, 0.5) 50%
+      rgba(0, 0, 0, 0.6) 50%,
+      rgba(0, 0, 0, 0.6) 50%
     ),
     url('../public/pictures/background_vinyl.jpg');
   background-position: center;
@@ -196,34 +196,71 @@
   color: #3e8c59;
 }
 
-.footer_container {
-  position: relative;
-  width: 100%;
-  bottom: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin: auto;
+.footer {
   background-color: transparent;
 }
 
-.footer_content {
-  width: 100%;
-  max-width: 100%;
+.footer_container {
+  color: white;
+  padding: 20px;
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-wrap: wrap;
 }
 
-.footer_content p {
-  margin: 0;
-  color: #f2f2f2;
-  font-size: 14px;
+.footer_content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  max-width: 1200px;
+  width: 100%;
+}
+
+.image_container {
+  flex: 1 1 100%;
   text-align: center;
 }
 
-.img-hdm-logo {
-  width: 50px;
-  height: 50px;
-  margin-right: 50px;
+.hdm_image {
+  max-width: 100%;
+  height: auto;
+}
+
+.link_container {
+  flex: 1 1 100%;
+  text-align: center;
+  margin-top: 10px;
+}
+
+.homebutton {
+  left: 0px;
+  width: 125px;
+  padding-top: 20px;
+  padding-right: 20px;
+  position: fixed;
+  z-index: 2;
+}
+
+.homebutton a {
+  display: block;
+  margin-bottom: 1em;
+  padding: 0.3em 1.25em;
+  border: 1px solid #3e8c59;
+  font-size: 1.1em;
+  line-height: 1.667em;
+  text-decoration: none;
+  color: #3e8c59;
+  cursor: pointer;
+  background: #fff;
+  transition: color,border-color ease 0.3s;
+  border-radius: 2em;
+}
+.homebutton a:hover {
+  border-color: #3e8c59;
+  color: white;
+  text-decoration: none;
+  background-color: #3e8c59;
+  transition: background-color 1s ease 0s;
 }

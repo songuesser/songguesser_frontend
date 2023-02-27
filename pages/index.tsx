@@ -2,6 +2,8 @@ import type { NextPage } from 'next';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import styles from '../styles/LandingPage.module.css';
+import Image from 'next/image'
+
 
 const Home: NextPage = () => {
   const router = useRouter();
@@ -12,6 +14,9 @@ const Home: NextPage = () => {
 
   return (
     <div className={styles.home}>
+          <div className={styles.homebutton}>
+              <a href="http://localhost:3000">Home</a>
+          </div>
       <Head>
         <title>Songguesser</title>
         <div className={styles.logo}></div>
@@ -46,7 +51,7 @@ const Home: NextPage = () => {
           </p>
         </div>
         <div className={styles.form}>
-          <h2>Statistics</h2>
+          <h2>Let's go</h2>
 
           <button
             className={styles.connectButton}
@@ -58,15 +63,21 @@ const Home: NextPage = () => {
           </button>
         </div>
       </div>
+      <div className={styles.footer}>
       <footer>
         <div className={styles.footer_container}>
-          <div className={styles.footer_content}>
-            <div className={styles.hdmi}></div>
-            <p>Softwareprojekt des Studiengang Medieninformatik</p>
-          </div>
+        <div className={styles.footer_content}>
+        <div className={styles.image_container}>
+          <Image src="/../public/pictures/hdm-logo.png" alt="me" width="64" height="64" />
         </div>
-      </footer>
-    </div>
+        <div className={styles.link_container}>
+        <a href="https://www.hdm-stuttgart.de/mi">Softwareprojekt des Studiengang Medieninformatik</a>
+        </div>
+      </div>
+  </div>
+  </footer>
+</div>
+</div>
   );
 };
 

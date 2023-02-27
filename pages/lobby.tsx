@@ -26,6 +26,14 @@ const Lobby: NextPage = () => {
       return;
     }
 
+    /*
+    const userNameCookie = getCookie("userName");
+    if(userNameCookie != undefined){
+      setUsername(userNameCookie);
+      setNewUsername(userNameCookie);
+    }
+    */
+
     listenToRoomUpdates(socket);
 
     return () => {
@@ -98,17 +106,31 @@ const Lobby: NextPage = () => {
     router.push({ pathname: '/room/', query: { id: roomId } });
   };
 
+  const getCookie = (name: string) => {
+    const value = "; " + document.cookie;
+    const parts = value.split("; " + name + "=");
+    if (parts.length === 2) {
+    return parts.pop()?.split(";").shift();
+    }
+  };
+
   return (
+    <div className={styles.container}>
+          <div className={styles.homebutton}>
+              <a href="http://localhost:3000">Home</a>
+          </div>
+    <div className={styles.home}>
+
+
     <main className={styles.main}>
       <p className={styles.statusInfo}>
-        {'Status: ' + socket?.active ? <p>Connected</p> : <p>Not Connected</p>}
+        {'Status: ' + socket?.active ? <span className='styles.connectedText'>Connected</span> : <span className='styles.notConnectedText'>Not Connected</span>}
       </p>
 
       <h1 className={styles.title}>Create or join game!</h1>
       <div className={styles.bigContainer}>
         <div className={styles.form}>
           <h2>Enter details</h2>
-          <p className={styles.detailsInfo}>Enter username below:</p>
 
           <input
             className={styles.smallTexts}
@@ -151,7 +173,7 @@ const Lobby: NextPage = () => {
                   <div key={key}>
                     <p>{room.roomName}</p>
                     {userName && (
-                      <button onClick={() => pushToRoom(room.roomId)}>
+                      <button className={styles.formButton} onClick={() => pushToRoom(room.roomId)}>
                         <p>Connect</p>
                       </button>
                     )}
@@ -163,6 +185,9 @@ const Lobby: NextPage = () => {
         </div>
       </div>
     </main>
+    </div>
+    </div>
+
   );
 };
 

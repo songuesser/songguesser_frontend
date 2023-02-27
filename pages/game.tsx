@@ -17,6 +17,7 @@ import { Song } from '../models/song';
 import { SelectSongDTO } from '../dto/selectSong';
 import Spotify from 'react-spotify-embed';
 import { getQueriesForElement } from '@testing-library/react';
+import { LeaveRoomDTO } from '../dto/leaveRoom';
 
 const GamePage: NextPage = () => {
   const socket = useContext(SocketContext);
@@ -97,9 +98,17 @@ const GamePage: NextPage = () => {
         setCountDownMessage(countdown.message);
         setCurrentSelectedPlayer(countdown.currentlySelectedPlayer);
         break;
+      case EVENTS.PLAYER_LEFT:
+        const leavingPlayer = event.data as Player
+        //cleanUpLeavingPlayer(leavingPlayer);
+        //displayPlayerCount();
+        break;
       case EVENTS.END:
-        setCountDownTotal(0);
-        setCountDownCurrent(0);
+          setCountDownTotal(0);
+          setCountDownCurrent(0);
+        break;
+
+
     }
   };
 
@@ -198,6 +207,48 @@ const GamePage: NextPage = () => {
     return trackId ?? '';
   };
 
+  const leaveRoom = (): void => {
+
+    console.log("Current Players (leaveROom ): " + JSON.stringify(players))
+
+    const leavingPlayer = players.find(
+      (user) => user.userId == socket?.id,
+    );
+
+    var leaveRoomDTO: LeaveRoomDTO;
+    if (leavingPlayer !== undefined) {
+      leaveRoomDTO = {
+        player: leavingPlayer,
+        roomId: roomId,
+      };
+      socket?.emit(WEBSOCKET_CHANNELS.LEAVE_ROOM, leaveRoomDTO);
+      router.push({ pathname: '/lobby' })
+    };
+    
+  }
+
+
+  const cleanUpLeavingPlayer = (leavingPlayer: Player): void => {
+
+    console.log("Current Players: " + JSON.stringify(players))
+    const playersIndex = players.findIndex(
+      (user) => user.userId == leavingPlayer.userId,
+    );
+    const playersJoinedIndex = gameInformation?.playersJoined.findIndex(
+      (user) => user.userId == leavingPlayer.userId,
+    );
+   
+    console.log("Leaving Player ID: " + leavingPlayer.userId)
+    console.log("Player " + players[playersIndex].username + " has left the game.")
+    players.splice(playersIndex, 1)
+    if (playersJoinedIndex !== undefined) {
+      gameInformation?.playersJoined.splice(playersJoinedIndex, 1)
+    }
+  }
+
+
+
+
   return (
     <div className={styles.container}>
       <main className={styles.main}>
@@ -222,6 +273,12 @@ const GamePage: NextPage = () => {
                 </p>
               );
             })}
+             <button
+              className={styles.connectButton}
+              onClick={() => leaveRoom()}
+            >
+              Leave room
+            </button>
           </div>
           {gameInformation?.state == GAMESTATE.GUESSING && (
             <div className={styles.musicContainer}>
@@ -270,14 +327,15 @@ const GamePage: NextPage = () => {
           <div className={styles.form}>
             <h2>Chat</h2>
             <div className={styles.chatContainer}>
-              Enter new message:
               <input
                 onChange={(e) => setMessage(e.target.value)}
                 value={message}
-              />
+                placeholder="Enter new message"              />
+              <div className={styles.chatButton}>  
               <button onClick={() => sendMessage()}>
                 <p>Send message</p>
               </button>
+              </div>
               {showMessages(messages).map((chatMsg, key) => {
                 return <p key={key}>{chatMsg.message}</p>;
               })}

@@ -91,6 +91,10 @@ const RoomsPage: NextPage = () => {
 
   return (
     <div className={styles.container}>
+          <div className={styles.homebutton}>
+              <a href="http://localhost:3000">Home</a>
+          </div>
+    <div className={styles.home}>
       <main className={styles.main}>
         <h1 className={styles.title}>Room: {roomName}</h1>
 
@@ -115,7 +119,7 @@ const RoomsPage: NextPage = () => {
         </div>
       </main>
     </div>
-  );
-};
+    </div>
+  );};
 
 export default RoomsPage;
