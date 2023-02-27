@@ -91,7 +91,6 @@ const Lobby: NextPage = () => {
 
   const listenToRoomUpdates = (socket: Socket) => {
     socket.on(WEBSOCKET_CHANNELS.LIST_ROOMS, (data: RoomsList) => {
-      console.log('ROOM UDPATES');
       setOpenRooms(data.rooms);
     });
   };
